@@ -4,12 +4,25 @@ namespace ES.Core.Command
 {
     public interface ICommand
     {
+        /// <summary>
+        /// Client Side command ID
+        /// </summary>
         Guid CommandId { get; }
+
+        /// <summary>
+        /// The Date/Time this command was created on the client
+        /// </summary>
+        DateTime ClientDateTimeCreated { get; }
+
+        /// <summary>
+        /// The aggregate id to mutate
+        /// </summary>
         Guid AggregateId { get; }
-        DateTime DateTimeCreated { get;  }                
-        DateTime DateTimeReceived  { get; }
-        DateTime? DateTimeRejected { get;  }                
-        DateTime? DateTimeFulfilled { get; }
-        Exception Exception { get; }
+
+        /// <summary>
+        /// The user/identity issuing the command
+        /// </summary>
+        string Identity { get; }
+        
     }
 }

@@ -2,14 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ES.Core.Aggregate;
+using ES.Core.Command.CommandEvents;
 using ES.Core.Events;
+using ES.Core.Exceptions;
 using ES.Core.Logging;
 using ES.Core.ServiceLocation;
 
 namespace ES.Core.Command
 {
     public class CommandDispatcher<A> : ICommandDispatcher<A> 
-        where A: class, IAggregateRoot
+        where A: AggregateRootBase
     {
         #region Dependencies
         private readonly IServiceLocator _serviceLocator;
@@ -30,7 +32,10 @@ namespace ES.Core.Command
                 where C : CommandBase          
         {
             try
-            {    
+            {
+                // Log the fact that we received a command
+                _eventRepo.PersistEvent(new CommandReceivedEvent(command));
+
                 // Load the Aggreage
                 var initAggregate = _aggreageFactory.Init(command.AggregateId);
                 var aggregate = (A)_eventRepo
@@ -51,16 +56,21 @@ namespace ES.Core.Command
                     .ForEach(e => _applyEvent(aggregate, e));
 
                 // Persist newly created events
-                newEvents.ForEach(_eventRepo.PersistEvent);                
+                newEvents.ForEach(_eventRepo.PersistEvent);
 
-                command.Successful();
+                // Mark the command as successful
+                _eventRepo.PersistEvent(new CommandFulfilledEvent(command));
+
+                // Log
                 _log.Info($"Command {command.CommandId} Succesful");
             }
             catch (Exception ex)
             {
-                command.Reject(ex);
-                _log.Error($"Command Rejected. CommandId: {command.CommandId} ", ex);
-                throw;
+                // Log the rejected command
+                _eventRepo.PersistEvent(new CommandRejectedEvent(command, ex));
+                var msg = $"Command Rejected. CommandId: {command.CommandId}. {ex.Message}";
+                _log.Error(msg, ex);             
+                throw new CommandRejectedException(msg, ex);
             }
         }
 
@@ -91,9 +101,24 @@ namespace ES.Core.Command
                 throw new NotImplementedException($"Multiple implementations of IApplyEvent found for type: '{t.FullName}' and version: {@event.Version}");
 
             // Apply the event and return the new aggregate state
-            var handler = correctVersionHandlers.First(); // <-- Only 1 IApplyEvent for this version :-)
+            var handler = correctVersionHandlers.First(); // <-- Only 1 IApplyEvent for this version :-)            
+
+            // Kee the old aggregate version number
+            var initialAggVersion = aggregate.AggregateVersion;
+
+            // Apply
             var getMethod = t.GetMethod("Apply");
-            return (A)getMethod.Invoke(handler, new object[] { aggregate, @event });
+            var updatedAggregate = (A)getMethod.Invoke(handler, new object[] { aggregate, @event });
+
+            // make sure the developer didn't change the aggergate version.
+            if (initialAggVersion != updatedAggregate.AggregateVersion)
+                throw new ApplicationException("Aggregate version changed. Handlers should not update the aggarate version.");
+
+            // Up the Aggregate  version. Only the command dispatcher should up the aggregate version
+            aggregate.IncrementAggregateVersion();
+
+            // Newly updated aggregate :-)
+            return updatedAggregate;
         }
     }
 }

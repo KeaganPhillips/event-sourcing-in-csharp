@@ -16,6 +16,6 @@ namespace ES.Core.Aggregate
         /// A state transision counter 
         /// </summary>
         /// <returns></returns>
-        int Version { get; }
+        int AggregateVersion { get; }
     }
 }

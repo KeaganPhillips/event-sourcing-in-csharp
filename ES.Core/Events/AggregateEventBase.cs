@@ -5,7 +5,7 @@ namespace ES.Core.Events
     public abstract class AggregateEventBase : IAggregateEvent
     {
         public Guid AggregateId { get; private set; }
-        public abstract int Version { get;  }       
+        public abstract int Version { get; }       
         public Guid EventId { get; private set; }
         public DateTime DateCreate { get; private set; }        
 

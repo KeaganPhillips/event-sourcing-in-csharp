@@ -6,6 +6,7 @@ namespace ES.Core.Events
 {
     public interface IAggregateEvent : IEvent
     {
+        int Version { get; }
         Guid AggregateId { get; }
     }
 }

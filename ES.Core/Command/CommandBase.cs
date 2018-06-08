@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 
 namespace ES.Core.Command
@@ -6,33 +7,18 @@ namespace ES.Core.Command
     {
         public Guid CommandId { get; private set; }
         public Guid AggregateId { get; private set; }
-        public DateTime DateTimeCreated { get; private set; }
+        public DateTime ClientDateTimeCreated { get; private set; }
         public DateTime DateTimeReceived  { get; private set; }
-        public DateTime? DateTimeRejected { get; private set; }                
-        public DateTime? DateTimeFulfilled { get; private set; }
-        public Exception Exception { get; set; }
+        public string Identity { get; private set; }
 
-        public CommandBase(Guid commandId, DateTime datetimeCreated, Guid aggregateId)
+        public CommandBase(Guid commandId, DateTime datetimeCreated, Guid aggregateId,
+            string identity)
         {
             this.CommandId = commandId;
-            this.DateTimeCreated = datetimeCreated;
+            this.ClientDateTimeCreated = datetimeCreated;
             this.DateTimeReceived = DateTime.Now;
             this.AggregateId = aggregateId;
+            this.Identity = identity;
         }
-
-        public void Reject(Exception ex)
-        {
-            this.DateTimeRejected = DateTime.Now;
-            this.DateTimeFulfilled = null;
-            this.Exception = ex;
-        }
-
-        public void Successful()
-        {
-            this.DateTimeFulfilled = DateTime.Now;
-            this.DateTimeRejected = null;
-            this.Exception = null;
-        }
-        
     }
 }

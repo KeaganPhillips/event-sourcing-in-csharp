@@ -32,7 +32,8 @@ namespace ES.CustomerService.API.Console
             // Get the command from the API (AMQP/REST..)
             var commandId = Guid.NewGuid(); // CLIENT genrated command id. 
             var dateCreated = DateTime.Now; // Date/Time the client created the command
-            var command = new DeactiveCustomerCommand(commandId, dateCreated, cust1Id);
+            var issuedBy = "keaganp@grindrodbank.co.za"; // Identity, like username of user who issued the command
+            var command = new DeactiveCustomerCommand(commandId, dateCreated, cust1Id, issuedBy);
 
             // Dispatch the command
             dispatcher.Dispatch(command);
@@ -43,7 +44,8 @@ namespace ES.CustomerService.API.Console
             // Get the command from the API (AMQP/REST..)
             var commandId = Guid.NewGuid(); // CLIENT genrated command id. 
             var dateCreated = DateTime.Now; // Date/Time the client created the command
-            var command = new CreateCustomerCommand(commandId, dateCreated)
+            var issuedBy = "keaganp@grindrodbank.co.za"; // Identity, like username of user who issued the command
+            var command = new CreateCustomerCommand(commandId, dateCreated, issuedBy)
             {
                 Name = Faker.Name.First(),
                 Surname = Faker.Name.Last(),
@@ -62,7 +64,8 @@ namespace ES.CustomerService.API.Console
             // Get the command from the API (AMQP/REST..)
             var commandId = Guid.NewGuid(); // CLIENT genrated command id. 
             var dateCreated = DateTime.Now; // Date/Time the client created the command
-            var command = new UpdateAddressCommand(commandId, dateCreated, aggId)
+            var issuedBy = "keaganp@grindrodbank.co.za"; // Identity, like username of user who issued the command
+            var command = new UpdateAddressCommand(commandId, dateCreated, aggId, issuedBy)
             {
                 NewAddressDetails = Faker.Address.StreetAddress()
             };

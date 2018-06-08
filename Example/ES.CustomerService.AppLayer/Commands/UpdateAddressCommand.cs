@@ -9,8 +9,8 @@ namespace ES.CustomerService.AppLayer.Commands
     {
         public string NewAddressDetails { get; set; }
 
-        public UpdateAddressCommand(Guid commandId, DateTime datetimeCreated, 
-            Guid aggregateId) : base(commandId, datetimeCreated, aggregateId)
+        public UpdateAddressCommand(Guid commandId, DateTime datetimeCreated, Guid aggregateId, string identity) 
+            : base(commandId, datetimeCreated, aggregateId, identity)
         {
         }
     }

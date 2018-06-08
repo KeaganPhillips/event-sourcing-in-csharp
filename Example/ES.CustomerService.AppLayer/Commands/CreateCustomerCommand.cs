@@ -13,8 +13,8 @@ namespace ES.CustomerService.AppLayer.Commands
         public string Address { get; set; }
         public CustomerStatus Status { get; set; }
 
-        public CreateCustomerCommand(Guid commandId, DateTime datetimeCreated) 
-            : base(commandId, datetimeCreated, Guid.NewGuid()) // <-- New Customer, so create new GUID
+        public CreateCustomerCommand(Guid commandId, DateTime datetimeCreated, string identity) 
+            : base(commandId, datetimeCreated, Guid.NewGuid(), identity) // <-- New Customer, so create new GUID
         {
         }
     }

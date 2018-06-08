@@ -9,13 +9,11 @@ namespace ES.CustomerService.Domain.Factories
     {
         public Customer Init(Guid aggreateId)
         {
-            return new Customer()
+            return new Customer(aggreateId)
             {
                 FirstName = null,
                 Surname = null,
-                Address = null,
-                Id = aggreateId,
-                Version = 0
+                Address = null                
             };
         }
     }
